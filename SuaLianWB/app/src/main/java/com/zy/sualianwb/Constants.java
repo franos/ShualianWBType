@@ -37,7 +37,7 @@ public class Constants {
     public static boolean isReady = false;
     public static boolean isInsign = false;
     public static boolean isAllDownloadOk = true;
-    public static boolean isStartDownload=false;
+    public static boolean isStartDownload = false;
 //-----------------------------------url-----------------------------------
 
     public static String HOST_REMOTE = "http://www.modiarts.com/";
@@ -66,10 +66,10 @@ public class Constants {
 //    public static final String IMAGE_URL_HOST = HOST + "ShualianWebDemo/image/";
 
     //模板图片的url请求地址
-    public static final String TEMPLATE_URL = "xxxx/";
+    public static final String TEMPLATE_URL = HOST_REMOTE + "a/vivo201512/canvastojpg/backgrounds.json";
 
     //showTime给过来的模板图片前段路径
-    public static final String TEMPLATE_URL_HOST = "xxxxxx/";
+    public static final String TEMPLATE_URL_HOST = HOST_REMOTE+"a/vivo201512/canvastojpg/bg/";
 
 //
 //    //测试demo

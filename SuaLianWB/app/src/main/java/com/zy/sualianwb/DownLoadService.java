@@ -19,8 +19,6 @@ import com.zy.sualianwb.util.ViewUtil;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 
 public class DownLoadService extends Service {
     public static boolean isStart = false;
@@ -29,7 +27,7 @@ public class DownLoadService extends Service {
     String TAG = "DownLoadService";
     private int downloadIndex;
     private boolean canStart = false;
-    private BlockingDeque<Boolean> blockingDeque = new LinkedBlockingDeque<>(10);
+//    private BlockingDeque<Boolean> blockingDeque = new LinkedBlockingDeque<>(10);
 
     public DownLoadService() {
 
@@ -77,7 +75,7 @@ public class DownLoadService extends Service {
             @Override
             public void onShowTimeGet(String json) {
                 try {
-//                    L.i(TAG, "showTime获取成功" + json);
+                    L.i("onShowTimeGet", "showTime获取成功" + json);
                     List<ShowTime3> showTime = Translate.translateShowTime3(json);
 //                    L.i(TAG, "showTime转换完毕:" + showTime);
                     StorageUtil.saveShowTime3(DownLoadService.this, showTime);

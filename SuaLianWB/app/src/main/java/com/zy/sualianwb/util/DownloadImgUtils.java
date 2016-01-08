@@ -30,7 +30,7 @@ public class DownloadImgUtils {
     public static boolean downloadImageByUrl(String urlStr, File file, boolean isOverWrite, Context context) {
         Log.i(TAG, "download url" + urlStr);
         if (file.exists() && (!isOverWrite)) {
-            Log.i("DownloadImgUtils", "文件已存在    跳过");
+            Log.i(TAG, "文件已存在    跳过");
             return true;
         }
         ShareUitl.writeString(Constants.SHARE_PREF_LAST_FILE, "file_path", file.getAbsolutePath(), context);
@@ -41,7 +41,6 @@ public class DownloadImgUtils {
         try {
             URL url = new URL(urlStr);
             conn = (HttpURLConnection) url.openConnection();
-
             is = conn.getInputStream();
             fos = new FileOutputStream(file);
             byte[] buf = new byte[BUFFER_SIZE];
@@ -54,6 +53,8 @@ public class DownloadImgUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
+            //有下载失败的文件，下载成功标志设置为false
+            Constants.isAllDownloadOk = false;
             //删除下载失误的文件
             if (null != file && file.exists()) {
                 L.e(TAG, "delete files");

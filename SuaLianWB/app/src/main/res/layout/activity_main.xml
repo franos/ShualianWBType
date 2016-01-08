@@ -99,13 +99,13 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/main_change_module"
                 style="@style/TextStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="true"
-                android:id="@+id/main_change_module"
-                android:text="切换模式"
                 android:onClick="changeModule"
+                android:text="切换模式"
                 android:textSize="32dp" />
         </LinearLayout>
 
@@ -137,13 +137,15 @@
             android:id="@+id/one_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="总时间" />
+            android:text="总时间"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/all_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="总时间" />
+            android:text="总时间"
+            android:visibility="invisible" />
 
 
         <LinearLayout

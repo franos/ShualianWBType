@@ -80,6 +80,7 @@ public class MainActivity extends BaseActivity {
         pickerViewLie.setFocusableInTouchMode(true);
         pickerViewLie.requestFocus(); // 初始不让EditText得焦点
         pickerViewLie.requestFocusFromTouch();
+        allTimeTV.setVisibility(View.INVISIBLE);
         initPickView();
 
 
@@ -189,8 +190,6 @@ public class MainActivity extends BaseActivity {
             setSuccessTips();
         }
         setDownloadUtilListener();
-
-
     }
 
     private void setDownloadUtilListener() {
@@ -264,7 +263,7 @@ public class MainActivity extends BaseActivity {
 
     private void setSuccessTips() {
         Constants.isStartDownload = false;
-        mDownLoadTimer.cancel();
+
         if (Constants.isAllDownloadOk) {
             tips.setTextColor(Color.parseColor("#689F38"));
             tips.setText("图片已全部下载完毕!");
@@ -280,16 +279,15 @@ public class MainActivity extends BaseActivity {
 
         Log.i(TAG, "write Downloadstate 1");
         ShareUitl.writeString(Constants.SHARE_PREF, "downLoadState", "1", this);
-        cancelTimeCounter();
+        if (!Constants.isAllDownloadOk) {
+            Toast.makeText(MainActivity.this, "图片下载不全，正在尝试重新下载", Toast.LENGTH_SHORT).show();
+            toDownload(null);
+        }
     }
 
-    private void cancelTimeCounter() {
-        mDownLoadTimer.cancel();
-    }
 
     private String getSecond(long stopAllMillis) {
         float fl = stopAllMillis / 1000;
-
         return String.valueOf(fl);
     }
 
@@ -422,6 +420,7 @@ public class MainActivity extends BaseActivity {
         Constants.currPos = DensityUtil.getCurrPos(currhang, currlie);
         L.i(TAG, "currPos=" + Constants.currPos);
         saveCurrPos(Constants.currPos);
+        initInsign();
     }
 
     /**
@@ -446,6 +445,7 @@ public class MainActivity extends BaseActivity {
             Toast.makeText(MainActivity.this, "下载已开始，不用重复点击", Toast.LENGTH_SHORT).show();
         } else {
             Constants.isAllDownloadOk = true;
+            Constants.isStartDownload = true;
             resetSuccessTips();
             tips.setText("开始下载图片");
             fetchUrl();
@@ -558,6 +558,7 @@ public class MainActivity extends BaseActivity {
         super.onDestroy();
         Constants.isStartDownload = false;
         timer.cancel();
+        mDownLoadTimer.cancel();
         currSecond = 0;
     }
 

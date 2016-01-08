@@ -466,7 +466,6 @@ public class BitmapUtil {
             MessageDigest md = MessageDigest.getInstance("md5");
             digest = md.digest(str.getBytes());
             return bytes2hex02(digest);
-
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

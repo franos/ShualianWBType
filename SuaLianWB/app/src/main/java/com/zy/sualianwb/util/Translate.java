@@ -70,7 +70,7 @@ public class Translate {
     public static List<ShowTime3> translateShowTime3(String json) {
         List<GetShowTime> getShowTimes = new JsonUtil().parseJsonArray(json, GetShowTime.class);
         List<ShowTime3> showTime3s = getShowTime3(getShowTimes);
-
+        Log.i(TAG, "translate showtime result " + showTime3s);
         return showTime3s;
     }
 
