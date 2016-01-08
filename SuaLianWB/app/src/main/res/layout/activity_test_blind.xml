@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.zy.sualianwb.test.TestBlindActivity">
+
+    <com.zy.sualianwb.util.BlindImageView
+        android:id="@+id/test_blindimage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.zy.sualianwb.BigImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.zy.sualianwb.util.BlindLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+
+
+
+        </com.zy.sualianwb.util.BlindLayout>
+
+    </com.zy.sualianwb.util.BlindImageView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="event"
+        android:text="click" />
+
+</RelativeLayout>

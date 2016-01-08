@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="#000000"
+    tools:context="com.zy.sualianwb.activity.PrepareActivity">
+
+    <TextView
+        android:id="@+id/pre_row"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:text="17行"
+        android:textSize="32sp" />
+
+    <TextView
+        android:id="@+id/pre_column"
+        android:textColor="#ffffff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@id/pre_row"
+        android:text="17列   第"
+        android:textSize="32sp" />
+
+
+    <TextView
+        android:id="@+id/pre_num"
+        android:textColor="#ffffff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/pre_column"
+        android:text="289"
+        android:textSize="156sp" />
+
+    <TextView
+        android:id="@+id/pre_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/pre_num"
+        android:layout_centerHorizontal="true"
+        android:clickable="true"
+        android:enabled="true"
+        android:text="START"
+        android:textColor="#76FF03"
+        android:textSize="64sp" />
+</RelativeLayout>

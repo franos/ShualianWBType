@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_clear_all"
+        android:title="清除所有缓存(包括图片)"></item>
+    <item
+        android:id="@+id/menu_clear_showtime"
+        android:title="清除缓存的时间轴"></item>
+    <item
+        android:id="@+id/menu_clear_url"
+        android:title="清除图片的url"></item>
+    <item
+        android:id="@+id/menu_clear_url_and_showtime"
+        android:title="清除url和时间轴"></item>
+</menu>
