@@ -1,189 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff">
+    android:background="@color/white"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".activity.MainActivity">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        tools:context=".activity.MainActivity">
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="horizontal">
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <EditText
+            android:id="@+id/main_change_num_y_edt"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:hint="行"
+            android:visibility="gone" />
+
+        <EditText
+            android:id="@+id/main_change_num_x_edt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:hint="列"
+            android:visibility="gone" />
+
+        <Button
+            android:visibility="gone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="changePos"
+            android:text="修改" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="选择位置" />
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.zy.sualianwb.util.PickerView
+            android:id="@+id/main_pickview_hang"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_weight="1"
             android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/main_change_num_y_edt"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:hint="行"
-                android:visibility="gone" />
-
-            <EditText
-                android:id="@+id/main_change_num_x_edt"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:hint="列" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="changePos"
-                android:text="修改" />
-        </LinearLayout>
+            app:selected_color="#E57373"
+            app:unselected_color="#FFCDD2" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="选择位置" />
+            android:layout_marginRight="10dp"
+            android:text="行"
+            android:textSize="18sp" />
 
-        <LinearLayout
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <com.zy.sualianwb.util.PickerView
-                android:id="@+id/main_pickview_hang"
-                android:layout_width="0dp"
-                android:layout_height="150dp"
-                android:layout_weight="1"
-                android:focusable="true"
-                app:selected_color="#E57373"
-                app:unselected_color="#FFCDD2" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:text="行"
-                android:textSize="18sp" />
-
-            <com.zy.sualianwb.util.PickerView
-                android:id="@+id/main_pickview_lie"
-                android:layout_width="0dp"
-                android:layout_height="150dp"
-                android:layout_weight="1"
-                app:selected_color="#E57373"
-                app:unselected_color="#FFCDD2" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:text="列"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/main_change_module"
-                style="@style/TextStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:onClick="changeModule"
-                android:text="切换模式"
-                android:textSize="32dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                style="@style/TextStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="toDownload"
-                android:text="下载图片"
-                android:textSize="32dp" />
-
-            <TextView
-                android:id="@+id/download_tips_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="下载计数" />
-
-        </LinearLayout>
+        <com.zy.sualianwb.util.PickerView
+            android:id="@+id/main_pickview_lie"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_weight="1"
+            app:selected_color="#E57373"
+            app:unselected_color="#FFCDD2" />
 
         <TextView
-            android:id="@+id/one_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="总时间"
-            android:visibility="invisible" />
+            android:layout_marginRight="10dp"
+            android:text="列"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/all_time"
+            android:id="@+id/main_change_module"
+            style="@style/TextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="总时间"
-            android:visibility="invisible" />
+            android:clickable="true"
+            android:onClick="changeModule"
+            android:text="切换模式"
+            android:textSize="32dp" />
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            style="@style/TextStyle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:onClick="toDownload"
+            android:text="下载图片"
+            android:textSize="32dp" />
 
-            <TextView
-                android:id="@+id/main_start"
-                style="@style/TextStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:onClick="toShow"
-                android:text="开始播放"
-                android:textColor="#004D40" />
-
-            <TextView
-                style="@style/TextStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:onClick="clearShowTime"
-                android:text="清理时间轴缓存"
-                android:textSize="22sp"
-                android:visibility="gone" />
-
-
-            <TextView
-                style="@style/TextStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:onClick="clear"
-                android:text="清除所有数据(包括图片)"
-                android:textColor="#BF360C"
-                android:textSize="22sp" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/download_tips_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text="下载计数" />
 
     </LinearLayout>
-</ScrollView>
+
+
+    <TextView
+        android:id="@+id/one_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="总时间" />
+
+    <TextView
+        android:id="@+id/all_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="总时间" />
+
+    <TextView
+        android:id="@+id/main_hasDownload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="已下载" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/main_start"
+            style="@style/TextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:onClick="toShow"
+            android:text="开始播放"
+            android:textColor="#004D40" />
+
+        <TextView
+            style="@style/TextStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:onClick="clearShowTime"
+            android:text="清理时间轴缓存"
+            android:textSize="22sp"
+            android:visibility="gone" />
+
+
+        <TextView
+            style="@style/TextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:onClick="clear"
+            android:text="清除所有数据(包括图片)"
+            android:textColor="#BF360C"
+            android:textSize="22sp" />
+    </LinearLayout>
+
+</LinearLayout>

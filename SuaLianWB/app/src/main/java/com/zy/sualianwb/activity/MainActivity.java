@@ -35,12 +35,9 @@ import com.zy.sualianwb.util.TimeUtil;
 import com.zy.sualianwb.util.Translate;
 import com.zy.sualianwb.util.ViewUtil;
 
-import org.joda.time.DateTime;
-
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -56,12 +53,14 @@ public class MainActivity extends BaseActivity {
     //下载
     private DownLoadUtil util;
     private TextView tips;
-    private TextView defTips, oneTimeTV, allTimeTV;
+    private TextView defTips, oneTimeTV, allTimeTV, hasDownloadTv;
     private int delayTime = 1000;
     private int downloadIndex;
 
-    private Timer mDownLoadTimer = new Timer();
-    private int currSecond;
+    private Timer mDownLoadTimer;
+    private int currSecond = 0;
+    private int reTryTime = 1;
+    Timestamp stopTimeStamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,14 +73,15 @@ public class MainActivity extends BaseActivity {
         allTimeTV = (TextView) findViewById(R.id.all_time);
         hang = (EditText) findViewById(R.id.main_change_num_y_edt);
         lie = (EditText) findViewById(R.id.main_change_num_x_edt);
+        hasDownloadTv = (TextView) findViewById(R.id.main_hasDownload);
         pickerViewHang = (PickerView) findViewById(R.id.main_pickview_hang);
         pickerViewLie = (PickerView) findViewById(R.id.main_pickview_lie);
         pickerViewLie.setFocusable(true);
         pickerViewLie.setFocusableInTouchMode(true);
         pickerViewLie.requestFocus(); // 初始不让EditText得焦点
         pickerViewLie.requestFocusFromTouch();
-        allTimeTV.setVisibility(View.INVISIBLE);
         initPickView();
+        resetHasDownLoad();
 
 
         hang.setText("" + Constants.Y_NUM);
@@ -263,23 +263,28 @@ public class MainActivity extends BaseActivity {
 
     private void setSuccessTips() {
         Constants.isStartDownload = false;
+        if (mDownLoadTimer != null) {
+            mDownLoadTimer.cancel();
+        }
 
         if (Constants.isAllDownloadOk) {
             tips.setTextColor(Color.parseColor("#689F38"));
             tips.setText("图片已全部下载完毕!");
         } else {
             tips.setTextColor(Color.parseColor("#EB9682"));
-            tips.setText("图片未全部下载完毕，请点击下载图片");
+            tips.setText("图片未全部下载完毕，请重新点击下载图片");
         }
-        delayTime = Integer.MAX_VALUE;
-        long stopAllMillis = TimeUtil.stopAll();
-        Date date = new Date(stopAllMillis);
-        DateTime dt = new DateTime(date);
-        allTimeTV.setText("" + getSecond(stopAllMillis));
+//        delayTime = Integer.MAX_VALUE;
+//        long stopAllMillis = TimeUtil.stopAll();
+//        Date date = new Date(stopAllMillis);
+//
+//        DateTime dt = new DateTime(date);
+//        allTimeTV.setText("" + getSecond(stopAllMillis));
 
         Log.i(TAG, "write Downloadstate 1");
         ShareUitl.writeString(Constants.SHARE_PREF, "downLoadState", "1", this);
-        if (!Constants.isAllDownloadOk) {
+        if (!Constants.isAllDownloadOk && reTryTime < 3) {
+            reTryTime++;
             Toast.makeText(MainActivity.this, "图片下载不全，正在尝试重新下载", Toast.LENGTH_SHORT).show();
             toDownload(null);
         }
@@ -310,31 +315,32 @@ public class MainActivity extends BaseActivity {
         } else {
             Log.w(TAG, "lastFile is null");
         }
-        mDownLoadTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        allTimeTV.setText("" + (++currSecond) + "秒");
-                    }
-                });
-            }
-
-        }, 0, delayTime);
-
         final List<String> url = imagesUrl.getUrl();
         if (null == url) {
             Log.e(TAG, "数据结构异常");
             return;
         }
 
+        int targetDownloadSize = url.size();
+        int hasDownloadSize = StorageUtil.hasDownload();
+        if (hasDownloadSize < targetDownloadSize) {
+
+        }
+
+
         new Thread() {
             @Override
             public void run() {
 
                 currSecond = 0;
+                stopTimeStamp = new Timestamp(System.currentTimeMillis());
+                final long cut0 = stopTimeStamp.getTime() - startTimeStamp.getTime();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        allTimeTV.setText("" + cut0 / 1000 + " 秒");
+                    }
+                });
 
                 for (int i = 0; i < url.size(); i++) {
                     final int finalI = i;
@@ -349,12 +355,25 @@ public class MainActivity extends BaseActivity {
                     TimeUtil.startDownLoadRecode();
                     boolean downloadState = DownloadImgUtils.downloadImgByUrl(urlImage, StorageUtil.getDiskCacheDirByPath(MainActivity.this, urlImage), MainActivity.this);
                     Log.i(TAG, "index " + (i + 1) + " downloadState=" + downloadState);
+                    stopTimeStamp = new Timestamp(System.currentTimeMillis());
+
+                    resetHasDownLoad();
+
+                    final long cut = stopTimeStamp.getTime() - startTimeStamp.getTime();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            allTimeTV.setText(" " + cut / 1000 + " 秒");
+                        }
+                    });
+
 
 //                    runOnUiThread(new Runnable() {
 //                        @Override
 //                        public void run() {
 //                            long singleMillis = TimeUtil.stopDownLoadRecode();
 //                            Log.i("millis",""+singleMillis);
+
 //                            oneTimeTV.setText("" + singleMillis);
 //                        }
 //                    });
@@ -408,7 +427,6 @@ public class MainActivity extends BaseActivity {
 
         pickerViewHang.setSelected("" + currHang);
         pickerViewLie.setSelected("" + currLie);
-
     }
 
     private void savePosState() {
@@ -439,8 +457,14 @@ public class MainActivity extends BaseActivity {
         savePosState();
     }
 
+    Timestamp startTimeStamp;
+
     public void toDownload(View view) {
-        boolean isStartDownload = Constants.isStartDownload;
+
+        if (null == startTimeStamp) {
+            startTimeStamp = new Timestamp(System.currentTimeMillis());
+        }
+        boolean isStartDownload = false;
         if (isStartDownload) {
             Toast.makeText(MainActivity.this, "下载已开始，不用重复点击", Toast.LENGTH_SHORT).show();
         } else {
@@ -449,6 +473,7 @@ public class MainActivity extends BaseActivity {
             resetSuccessTips();
             tips.setText("开始下载图片");
             fetchUrl();
+
         }
     }
 
@@ -507,6 +532,7 @@ public class MainActivity extends BaseActivity {
             public void onClick(DialogInterface dialog, int which) {
                 StorageUtil.clearAllData(MainActivity.this);
                 dialog.dismiss();
+                resetHasDownLoad();
                 ViewUtil.showSingleToast(MainActivity.this, "清理完毕");
                 resetSuccessTips();
             }
@@ -514,6 +540,17 @@ public class MainActivity extends BaseActivity {
         dialogBuilder.setNegativeButton("不清除", null);
         AlertDialog dialog = dialogBuilder.create();
         dialog.show();
+    }
+
+    private void resetHasDownLoad() {
+        final int hasDownload = StorageUtil.hasDownload();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                hasDownloadTv.setText("已下载 " + hasDownload);
+            }
+        });
+
     }
 
 //    public void clearShowTime(View view) {
@@ -557,9 +594,14 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         Constants.isStartDownload = false;
-        timer.cancel();
-        mDownLoadTimer.cancel();
+        if (null != timer) {
+            timer.cancel();
+        }
+        if (null != mDownLoadTimer) {
+            mDownLoadTimer.cancel();
+        }
         currSecond = 0;
+        startTimeStamp = null;
     }
 
 }

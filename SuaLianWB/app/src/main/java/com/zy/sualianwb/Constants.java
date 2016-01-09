@@ -68,8 +68,8 @@ public class Constants {
     //模板图片的url请求地址
     public static final String TEMPLATE_URL = HOST_REMOTE + "a/vivo201512/canvastojpg/backgrounds.json";
 
-    //showTime给过来的模板图片前段路径
-    public static final String TEMPLATE_URL_HOST = HOST_REMOTE+"a/vivo201512/canvastojpg/bg/";
+    //showTime给过来的模板图片前段路径,拼上去
+    public static final String TEMPLATE_URL_HOST = HOST_IMAGEDOWNLOAD;
 
 //
 //    //测试demo

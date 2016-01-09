@@ -130,6 +130,11 @@ public class Translate {
     public static ImagesUrl translateTemplateUrl(String json) {
         ImagesUrl url = new ImagesUrl();
         List<GetsImageUrls> getsImageUrlses = new JsonUtil().parseJsonArray(json, GetsImageUrls.class);
+        for (int i = 0; i < getsImageUrlses.size(); i++) {
+            GetsImageUrls urls = getsImageUrlses.get(i);
+            String trueSrc = Constants.HOST_IMAGEDOWNLOAD + urls.getSrc() + ".jpg";
+            urls.setSrc(trueSrc);
+        }
         List<String> urls = new ArrayList<>(getsImageUrlses.size());
         for (int i = 0; i < getsImageUrlses.size(); i++) {
             urls.add(getsImageUrlses.get(i).getSrc());

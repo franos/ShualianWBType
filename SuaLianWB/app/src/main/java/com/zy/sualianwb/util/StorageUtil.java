@@ -170,7 +170,7 @@ public class StorageUtil {
 
     public synchronized static List<ShowTime3> getShowTime3(Context context) {
         DataBase db = LiteOrm.newInstance(context, Constants.DB_NAME);
-        ArrayList<ShowTime3> showTimes=new ArrayList<>();
+        ArrayList<ShowTime3> showTimes = new ArrayList<>();
 //        showTimes = db.queryAll(ShowTime3.class);
 //        if (showTimes.isEmpty()) {
 //            Log.i(TAG, "showTimes3 is empty return null");
@@ -254,6 +254,14 @@ public class StorageUtil {
                 files[i].delete();
             }
         }
+    }
+
+    public static int hasDownload() {
+        File mFile = new File(Constants.CACHE_PATH_EXTRA);
+        if (mFile.exists() && mFile.isDirectory()) {
+            return mFile.list().length;
+        }
+        return 0;
     }
 
     public static void clearShowTime(Context context) {

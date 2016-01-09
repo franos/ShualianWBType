@@ -94,8 +94,6 @@ public class ShowActivity2 extends BaseActivity {
                         sendToPlayUrl(targetUrl);
                     }
                 }
-
-
             }
         };
         showThread.start();

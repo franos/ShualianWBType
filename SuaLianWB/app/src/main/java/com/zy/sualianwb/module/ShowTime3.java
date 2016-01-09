@@ -57,8 +57,6 @@ public class ShowTime3 {
         } else {
             millis = dt.getMillis();
         }
-
-
         long cut = millis - currentTimeMillis;
 
         int currPos = Constants.currPos;//当前位置
