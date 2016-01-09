@@ -19,20 +19,20 @@ public class HttpUtil {
             synchronized (HttpUtil.class) {
                 if (client == null) {
                     client = new OkHttpClient();
-                    client.setConnectTimeout(5000, TimeUnit.SECONDS);
-                    client.setReadTimeout(5000, TimeUnit.SECONDS);
-                    client.setWriteTimeout(5000, TimeUnit.SECONDS);
+                    client.setConnectTimeout(30, TimeUnit.SECONDS);
+                    client.setReadTimeout(30, TimeUnit.SECONDS);
+                    client.setWriteTimeout(30, TimeUnit.SECONDS);
                 }
             }
         }
     }
+
     /**
      * @return
      */
     public synchronized static OkHttpClient getClient() {
         return client;
     }
-
 
 
     public static String get(String url) throws IOException {

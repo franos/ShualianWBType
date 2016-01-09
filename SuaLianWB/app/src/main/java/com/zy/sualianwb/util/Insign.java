@@ -17,10 +17,10 @@ public class Insign {
 
     public static List<Integer> getInsign() {
         int[] ins = {
-                89, 90, 91, 93, 94, 95,106, 107, 108, 123, 124, 125, 140, 141,
+                89, 90, 91, 93, 94, 95, 106, 107, 108, 123, 124, 125, 140, 141,
                 142, 157, 158, 159, 189, 190, 191, 192, 193, 194, 206,
                 207, 208, 209, 210, 211, 223, 224, 225, 226, 227, 228,
-                 110, 111,112, 127, 128, 129, 144, 145, 146,
+                110, 111, 112, 127, 128, 129, 144, 145, 146,
                 161, 162, 163, 177, 178, 179, 180, 181, 195, 196, 197
         };
         List<Integer> inLis = toLis(ins);
@@ -45,12 +45,23 @@ public class Insign {
     public static boolean isInsign() {
         List<Integer> insign = Insign.getInsign();
         int currPos = Constants.currPos;
-        if (insign.contains(currPos) || Constants.isInsign) {
+        if (insign.contains(currPos) ) {
             //在里面下载全量图
-            return true;
+            if(Constants.isInsign){
+                return true;
+            }else{
+                return false;
+            }
+
         } else {
             //在外面下载模板图
-            return false;
+            if(Constants.isInsign){
+                return true;
+            }else{
+                return false;
+            }
+
+
         }
     }
 }

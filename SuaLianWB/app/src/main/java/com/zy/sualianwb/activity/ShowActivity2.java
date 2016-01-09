@@ -71,7 +71,7 @@ public class ShowActivity2 extends BaseActivity {
             @Override
             public void run() {
                 super.run();
-                while (isRun) {
+                while (isRun && !Constants.shouldStopNow) {
                     try {
                         Thread.sleep(200);
                     } catch (InterruptedException e) {

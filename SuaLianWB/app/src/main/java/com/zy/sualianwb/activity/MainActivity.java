@@ -290,7 +290,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-
     private String getSecond(long stopAllMillis) {
         float fl = stopAllMillis / 1000;
         return String.valueOf(fl);
@@ -460,10 +459,11 @@ public class MainActivity extends BaseActivity {
     Timestamp startTimeStamp;
 
     public void toDownload(View view) {
-
+        Constants.shouldStopNow = false;
         if (null == startTimeStamp) {
             startTimeStamp = new Timestamp(System.currentTimeMillis());
         }
+
         boolean isStartDownload = false;
         if (isStartDownload) {
             Toast.makeText(MainActivity.this, "下载已开始，不用重复点击", Toast.LENGTH_SHORT).show();
@@ -489,8 +489,75 @@ public class MainActivity extends BaseActivity {
 
 
     public void toShow(View view) {
-        Intent intent = new Intent(this, PrepareActivity.class);
-        startActivity(intent);
+
+        DownLoadUtil checkUtil = new DownLoadUtil();
+        checkUtil.setOnDataGet(new DownLoadUtil.OnDataGet() {
+            @Override
+            public void onUrlsGet(String json) {
+                ImagesUrl imagesUrl = Translate.translateTemplateUrl(json);
+                int hasDownload = StorageUtil.hasDownload();
+                int targetUrlSize = imagesUrl.getUrl().size();
+                if (targetUrlSize > hasDownload) {
+                    Constants.shouldStopNow = true;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setMessage("图片下载数量不够，请再次点击下载");
+                    builder.create().show();
+                } else {
+                    Constants.shouldStopNow = false;
+                    Intent intent = new Intent(MainActivity.this, PrepareActivity.class);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onShowTimeGet(String json) {
+
+            }
+
+            @Override
+            public void onUrlsGetFail(String msg) {
+                Toast.makeText(MainActivity.this, "网络连接异常，验证失败", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onShowTimeGetFail(String msg) {
+
+            }
+        });
+        checkUtil.setOnTemplateGet(new DownLoadUtil.OnTemplateGet() {
+            @Override
+            public void onTemplateGet(String json) {
+                ImagesUrl imagesUrl = Translate.translateTemplateUrl(json);
+                int hasDownload = StorageUtil.hasDownload();
+                int targetUrlSize = imagesUrl.getUrl().size();
+                if (targetUrlSize > hasDownload) {
+                    Constants.shouldStopNow = true;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setMessage("图片下载数量不够，请再次点击下载");
+                    builder.create().show();
+                } else {
+                    Constants.shouldStopNow = false;
+                    Intent intent = new Intent(MainActivity.this, PrepareActivity.class);
+                    startActivity(intent);
+                }
+
+            }
+
+            @Override
+            public void onFail(String obj) {
+
+            }
+        });
+
+        if (Insign.isInsign()) {
+            checkUtil.getUrls();
+        } else {
+            checkUtil.getTemplateUrl();
+
+        }
+
+
     }
 
 //    public void choose(View view) {

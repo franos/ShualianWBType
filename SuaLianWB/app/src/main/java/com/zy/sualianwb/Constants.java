@@ -38,6 +38,8 @@ public class Constants {
     public static boolean isInsign = false;
     public static boolean isAllDownloadOk = true;
     public static boolean isStartDownload = false;
+    public static boolean shouldStopNow = false;
+
 //-----------------------------------url-----------------------------------
 
     public static String HOST_REMOTE = "http://www.modiarts.com/";
@@ -84,7 +86,7 @@ public class Constants {
     }
 
 
-    public static final String CACHE_PATH_EXTRA = Environment.getExternalStorageDirectory() + "/image_cache";
+    public static final String CACHE_PATH_EXTRA = Environment.getExternalStorageDirectory() + "/EasyShare/image";
     public static final String DATE_FOMAT = "yyyy-MM-dd HH:mm:ss";
 
     public static final String CACHE_PATH = Environment.getDataDirectory() + "/image_cache";

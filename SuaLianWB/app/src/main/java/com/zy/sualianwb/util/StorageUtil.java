@@ -14,8 +14,6 @@ import com.zy.sualianwb.module.ShowTime2;
 import com.zy.sualianwb.module.ShowTime3;
 
 import java.io.File;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -38,9 +36,11 @@ public class StorageUtil {
         } else {
             cachePath = context.getCacheDir().getPath();
         }
+//        cachePath=Environment.getRootDirectory().getAbsolutePath();
         File file = new File(cachePath);
         if (!file.exists()) {
-            file.mkdir();
+            boolean mkdir = file.mkdirs();
+            Log.i(TAG, "mkdir" + mkdir);
         }
         return cachePath;
     }
@@ -64,7 +64,9 @@ public class StorageUtil {
      * @return
      */
     public static File getDiskCacheDirByPath(Context context, String url) {
-        return getDiskCacheDir(context, md5(url));
+        File diskCacheDir = getDiskCacheDir(context, md5(url));
+
+        return diskCacheDir;
     }
 
 
@@ -75,16 +77,21 @@ public class StorageUtil {
      * @return
      */
     public static String md5(String str) {
-        byte[] digest = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("md5");
-            digest = md.digest(str.getBytes());
-            return bytes2hex02(digest);
+//        byte[] digest = null;
+//        try {
+//            MessageDigest md = MessageDigest.getInstance("md5");
+//            digest = md.digest(str.getBytes());
+//            return bytes2hex02(digest);
+//
+//        } catch (NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
 
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return null;
+        int lastIndexOf = str.lastIndexOf("/");
+        String substring = str.substring(lastIndexOf + 1);
+        Log.i(TAG, "url name " + substring);
+        return substring;
     }
 
     /**

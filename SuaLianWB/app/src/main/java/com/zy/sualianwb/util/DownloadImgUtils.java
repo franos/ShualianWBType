@@ -33,6 +33,7 @@ public class DownloadImgUtils {
             Log.i(TAG, "文件已存在    跳过");
             return true;
         }
+
         ShareUitl.writeString(Constants.SHARE_PREF_LAST_FILE, "file_path", file.getAbsolutePath(), context);
         Log.i(TAG, "download url start");
         FileOutputStream fos = null;

@@ -1,6 +1,7 @@
 package com.zy.sualianwb.util;
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,8 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 
 /**
@@ -415,6 +414,15 @@ public class BitmapUtil {
      */
     private Handler mUIHandler = new Handler() {
         public void handleMessage(Message msg) {
+            if (msg.what == -200) {
+                String path = (String) msg.obj;
+                Log.w(TAG, "没有成功下载此图片" + path);
+                AlertDialog.Builder b = new AlertDialog.Builder(mContext);
+                b.setMessage("没有成功下载此图片" + path + " ,播放已被停止");
+                b.create().show();
+                return;
+            }
+
             // 获取得到图片，为imageview回调设置图片
             ImgBeanHolder holder = (ImgBeanHolder) msg.obj;
             Bitmap bm = holder.bitmap;
@@ -455,45 +463,49 @@ public class BitmapUtil {
     }
 
     /**
-     * 利用签名辅助类，将字符串字节数组
-     *
-     * @param str
-     * @return
+     * //     * 利用签名辅助类，将字符串字节数组
+     * //     *
+     * //     * @param str
+     * //     * @return
+     * //
      */
-    public String md5(String str) {
-        byte[] digest = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("md5");
-            digest = md.digest(str.getBytes());
-            return bytes2hex02(digest);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * 方式二
-     *
-     * @param bytes
-     * @return
-     */
-    public String bytes2hex02(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        String tmp = null;
-        for (byte b : bytes) {
-            // 将每个字节与0xFF进行与运算，然后转化为10进制，然后借助于Integer再转化为16进制
-            tmp = Integer.toHexString(0xFF & b);
-            if (tmp.length() == 1)// 每个字节8为，转为16进制标志，2个16进制位
-            {
-                tmp = "0" + tmp;
-            }
-            sb.append(tmp);
-        }
-        return sb.toString();
-
-    }
-
+//    public String md5(String str) {
+////        byte[] digest = null;
+////        try {
+////            MessageDigest md = MessageDigest.getInstance("md5");
+////            digest = md.digest(str.getBytes());
+////            return bytes2hex02(digest);
+////        } catch (NoSuchAlgorithmException e) {
+////            e.printStackTrace();
+////        }
+////        return null;
+//        int lastIndexOf = str.lastIndexOf("/");
+//        String substring = str.substring(lastIndexOf + 1);
+//        Log.i(TAG, "url name" + substring);
+//        return substring;
+//    }
+//
+//    /**
+//     * 方式二
+//     *
+//     * @param bytes
+//     * @return
+//     */
+//    public String bytes2hex02(byte[] bytes) {
+//        StringBuilder sb = new StringBuilder();
+//        String tmp = null;
+//        for (byte b : bytes) {
+//            // 将每个字节与0xFF进行与运算，然后转化为10进制，然后借助于Integer再转化为16进制
+//            tmp = Integer.toHexString(0xFF & b);
+//            if (tmp.length() == 1)// 每个字节8为，转为16进制标志，2个16进制位
+//            {
+//                tmp = "0" + tmp;
+//            }
+//            sb.append(tmp);
+//        }
+//        return sb.toString();
+//
+//    }
     private Bitmap loadImageFromLocal(final String path,
                                       final ImageView imageView) {
         Bitmap bm;
@@ -518,7 +530,7 @@ public class BitmapUtil {
                     refreashBitmap(path, imageView, bm);
                     return;
                 }
-                File file = getDiskCacheDir(imageView.getContext(), md5(path));
+                File file = getDiskCacheDir(imageView.getContext(), StorageUtil.md5(path));
                 Log.e(TAG, "start find image :" + file + " in disk cache .");
                 if (file.exists())// 如果在缓存文件中发现
                 {
@@ -537,13 +549,19 @@ public class BitmapUtil {
                         }
                     }
                 } else {
+                    // TODO: 16/1/9
+                    Constants.shouldStopNow = true;
 
-                    boolean downloadState = DownloadImgUtils.downloadImageByUrl(path, file, true, mContext);
-                    if (downloadState)// 如果下载成功
-                    {
-                        Log.e(TAG, "download image :" + path + " to disk cache . path is " + file.getAbsolutePath());
-                        bm = loadImageFromLocal(file.getAbsolutePath(), imageView);
-                    }
+                    mUIHandler.obtainMessage(-200, path).sendToTarget();
+
+
+//
+//                    boolean downloadState = DownloadImgUtils.downloadImageByUrl(path, file, true, mContext);
+//                    if (downloadState)// 如果下载成功
+//                    {
+//                        Log.e(TAG, "download image :" + path + " to disk cache . path is " + file.getAbsolutePath());
+//                        bm = loadImageFromLocal(file.getAbsolutePath(), imageView);
+//                    }
                 }
                 addBitmapToLruCache(path, bm);
                 Log.i(TAG, "" + bm);
