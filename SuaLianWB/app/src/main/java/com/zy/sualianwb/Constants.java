@@ -39,12 +39,14 @@ public class Constants {
     public static boolean isAllDownloadOk = true;
     public static boolean isStartDownload = false;
     public static boolean shouldStopNow = false;
+    public static boolean shouldLock = false;
 
 //-----------------------------------url-----------------------------------
 
     public static String HOST_REMOTE = "http://www.modiarts.com/";
     //    public static String HOST = "http://192.168.1.254:55555/";
     public static String HOST_IMAGEDOWNLOAD = "http://101.226.152.105/";
+//    public static String HOST_IMAGEDOWNLOAD = "http://192.168.16.168:55555/pics/";
 //    public static String HOST = "http://192.168.1.102:8080/";
 
     //显示图片的时间请求地址
@@ -58,10 +60,7 @@ public class Constants {
 
     //图片url请求地址
     public static final String URLS_HOST = HOST_REMOTE + "a/vivo201512/canvastojpg/data.json";
-    //    public static final String URLS_HOST = HOST + "ShualianWebDemo/GETImageServlet";
-    //    //请求默认图片(当主图没了就播这几个)
-    public static final String DEFAULT_PIC_URL = HOST_IMAGEDOWNLOAD + "a/vivo201512/getpic.php";
-    //    public static final String DEFAULT_PIC_URL = HOST + "ShualianWebDemo/GetDefaultImageServlet";
+
     //图片的前段路径，即除去图片名部分
 //    public static final String IMAGE_URL_HOST = HOST_REMOTE + "a/vivo201512/canvastojpg/op/";
     public static final String IMAGE_URL_HOST = HOST_IMAGEDOWNLOAD;

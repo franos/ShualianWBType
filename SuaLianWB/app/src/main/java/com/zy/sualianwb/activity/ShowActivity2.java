@@ -6,7 +6,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.WindowManager;
+import android.content.Intent;
 
 import com.zy.sualianwb.Constants;
 import com.zy.sualianwb.R;
@@ -33,6 +35,7 @@ public class ShowActivity2 extends BaseActivity {
     private boolean isRun = true;
     private String TAG = "ShowActivity2";
     private String currUrl;
+
 
     @Override
     protected void onResume() {
@@ -62,7 +65,6 @@ public class ShowActivity2 extends BaseActivity {
         });
 //        startShowThread();
 
-
         startShowThread2();
     }
 
@@ -87,6 +89,7 @@ public class ShowActivity2 extends BaseActivity {
                             if (diff <= 0) {
 //                                targetUrl = showTime3.getSrc();
                                 targetUrl = getSrc(showTime3);
+
                             } else {
                                 break;
                             }
@@ -238,6 +241,24 @@ public class ShowActivity2 extends BaseActivity {
         }
 
         return super.onKeyLongPress(keyCode, event);
+    }
+
+
+    int clickCount = 1;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                clickCount++;
+                if (clickCount > 3) {
+                    Intent i = new Intent(ShowActivity2.this, MainActivity.class);
+                    startActivity(i);
+                    this.finish();
+                }
+                break;
+        }
+        return super.onTouchEvent(event);
     }
 
 

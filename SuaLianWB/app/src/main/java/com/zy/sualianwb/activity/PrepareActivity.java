@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -134,4 +135,23 @@ public class PrepareActivity extends BaseActivity {
         }
         return versionName;
     }
+
+    int clickCount = 1;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                clickCount++;
+                if (clickCount > 3) {
+                    Intent i = new Intent(PrepareActivity.this, MainActivity.class);
+                    startActivity(i);
+                    this.finish();
+                }
+                break;
+        }
+        return super.onTouchEvent(event);
+    }
+
+
 }

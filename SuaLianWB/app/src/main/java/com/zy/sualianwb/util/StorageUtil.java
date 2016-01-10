@@ -161,6 +161,11 @@ public class StorageUtil {
 //        L.e(TAG, "showTime3库刷新完毕");
     }
 
+    public static void clearShowTimeCache() {
+        Constants.playShowTimeList.clear();
+
+    }
+
     public synchronized static ImagesUrl getImagesUrl(Context context) {
         DataBase db = LiteOrm.newInstance(context, Constants.DB_NAME);
         ArrayList<ImagesUrl> imagesUrls = db.queryAll(ImagesUrl.class);

@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.zy.sualianwb.module.ImagesUrl;
 import com.zy.sualianwb.module.ShowTime3;
+import com.zy.sualianwb.util.DeviceUtil;
 import com.zy.sualianwb.util.DownLoadUtil;
 import com.zy.sualianwb.util.DownloadImgUtils;
 import com.zy.sualianwb.util.L;
@@ -16,6 +18,7 @@ import com.zy.sualianwb.util.StorageUtil;
 import com.zy.sualianwb.util.Translate;
 import com.zy.sualianwb.util.ViewUtil;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,7 +30,10 @@ public class DownLoadService extends Service {
     String TAG = "DownLoadService";
     private int downloadIndex;
     private boolean canStart = false;
-//    private BlockingDeque<Boolean> blockingDeque = new LinkedBlockingDeque<>(10);
+    //    private BlockingDeque<Boolean> blockingDeque = new LinkedBlockingDeque<>(10);
+    private int timeDiffcheckoutCount = 1;
+    private long currCheckoutTime = 0;
+    private Thread checkoutTimeThread;
 
     public DownLoadService() {
 
@@ -50,6 +56,7 @@ public class DownLoadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         L.i(TAG, "downloadService init");
+
 
         timer = new Timer();
         util = new DownLoadUtil();
@@ -79,6 +86,10 @@ public class DownLoadService extends Service {
                     List<ShowTime3> showTime = Translate.translateShowTime3(json);
 //                    L.i(TAG, "showTime转换完毕:" + showTime);
                     StorageUtil.saveShowTime3(DownLoadService.this, showTime);
+                    Log.i(TAG, "矫正时间");
+                    checkoutTime();
+
+
                     L.i(TAG, "showTime保存完毕:");
                     if (!Constants.isReady) {
                         Toast.makeText(DownLoadService.this, "初始化完毕", Toast.LENGTH_SHORT).show();
@@ -104,13 +115,42 @@ public class DownLoadService extends Service {
                 L.e(TAG, "获取时间列表失败");
 
 
-
-
-
             }
         });
         getShowTimeHandler.obtainMessage(1).sendToTarget();
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void checkoutTime() {
+        if (checkoutTimeThread == null) {
+            Log.w(TAG, "checkoutTimeThread 为 null");
+            checkoutTimeThread = new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    long diff = 0;
+                    try {
+                        diff = DeviceUtil.checkoutTime();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    currCheckoutTime += diff;
+
+                    Constants.UP_CUT_TIME = currCheckoutTime / timeDiffcheckoutCount;
+
+                    timeDiffcheckoutCount++;
+
+                    Log.i(TAG, "DIFF=" + Constants.UP_CUT_TIME);
+                    checkoutTimeThread = null;
+                }
+            };
+        } else {
+            Log.w(TAG, "checkoutTimeThread 不为空");
+        }
+        checkoutTimeThread.start();
+
+
     }
 
     private Handler getShowTimeHandler = new Handler() {
@@ -191,7 +231,7 @@ public class DownLoadService extends Service {
                 for (int i = 0; i < url.size(); i++) {
                     DownLoadService.this.downloadIndex = i;
                     String urlImage = url.get(downloadIndex);
-                    boolean downloadState = DownloadImgUtils.downloadImgByUrl(urlImage, StorageUtil.getDiskCacheDirByPath(DownLoadService.this, urlImage),null);
+                    boolean downloadState = DownloadImgUtils.downloadImgByUrl(urlImage, StorageUtil.getDiskCacheDirByPath(DownLoadService.this, urlImage), null);
                     if (downloadState) {
                         mDownloadSusHandler.obtainMessage(1, url).sendToTarget();
                     } else {

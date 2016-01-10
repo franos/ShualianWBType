@@ -1,13 +1,17 @@
 package com.zy.sualianwb.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -36,9 +40,12 @@ import com.zy.sualianwb.util.Translate;
 import com.zy.sualianwb.util.ViewUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -49,11 +56,11 @@ public class MainActivity extends BaseActivity {
     Timer timer, checkVersonTimer;
     boolean show = true;
     PickerView pickerViewHang, pickerViewLie;
-
+    Thread checkOutThread;
     //下载
     private DownLoadUtil util;
     private TextView tips;
-    private TextView defTips, oneTimeTV, allTimeTV, hasDownloadTv;
+    private TextView defTips, oneTimeTV, allTimeTV, hasDownloadTv, versionTv;
     private int delayTime = 1000;
     private int downloadIndex;
 
@@ -61,6 +68,16 @@ public class MainActivity extends BaseActivity {
     private int currSecond = 0;
     private int reTryTime = 1;
     Timestamp stopTimeStamp;
+    TextView changeModuleTV;
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        resetHasDownLoad();
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,12 +93,19 @@ public class MainActivity extends BaseActivity {
         hasDownloadTv = (TextView) findViewById(R.id.main_hasDownload);
         pickerViewHang = (PickerView) findViewById(R.id.main_pickview_hang);
         pickerViewLie = (PickerView) findViewById(R.id.main_pickview_lie);
+        versionTv = (TextView) findViewById(R.id.main_version);
+        changeModuleTV = (TextView) findViewById(R.id.main_change_module);
+
+
+        getAppVersionName(this);
+        versionTv.setText("当前版本" + versioncode);
+
+
         pickerViewLie.setFocusable(true);
         pickerViewLie.setFocusableInTouchMode(true);
         pickerViewLie.requestFocus(); // 初始不让EditText得焦点
         pickerViewLie.requestFocusFromTouch();
         initPickView();
-        resetHasDownLoad();
 
 
         hang.setText("" + Constants.Y_NUM);
@@ -103,23 +127,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void run() {
                 try {
-                    TimeUtil.startRecode();
-
-                    String s = HttpUtil.get(Constants.CHECK_TIME);
-                    CrtTime crtTime = new Gson().fromJson(s, CrtTime.class);
-
-                    long stopDelay = TimeUtil.stop() / 2;
-                    Timestamp beiJinTimeStamp = new Timestamp(crtTime.getBjtime());
-
-                    Timestamp localTimeStamp = new Timestamp(System.currentTimeMillis());
-
-                    //此时的北京时间
-                    long trueBeijinTime = beiJinTimeStamp.getTime() + stopDelay;
-                    //此时的本地时间
-                    long trueLocalTimeStamp = localTimeStamp.getTime() - stopDelay;
-                    //相隔时间
-                    Constants.UP_CUT_TIME = trueBeijinTime - trueLocalTimeStamp;
-                    Log.e(TAG, "偏差时间" + Constants.UP_CUT_TIME);
+                    checkoutTime();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -130,15 +138,57 @@ public class MainActivity extends BaseActivity {
         initDownLoad();
         initInsign();
 
+
+    }
+
+
+
+    private void checkoutTime() throws IOException {
+        TimeUtil.startRecode();
+
+        String s = HttpUtil.get(Constants.CHECK_TIME);
+        CrtTime crtTime = new Gson().fromJson(s, CrtTime.class);
+
+        long stopDelay = TimeUtil.stop() / 2;
+        Timestamp beiJinTimeStamp = new Timestamp(crtTime.getBjtime());
+
+        Timestamp localTimeStamp = new Timestamp(System.currentTimeMillis());
+
+        //此时的北京时间
+        long trueBeijinTime = beiJinTimeStamp.getTime() + stopDelay;
+        //此时的本地时间
+        long trueLocalTimeStamp = localTimeStamp.getTime() - stopDelay;
+        //相隔时间
+        Constants.UP_CUT_TIME = trueBeijinTime - trueLocalTimeStamp;
+        Log.e(TAG, "偏差时间" + Constants.UP_CUT_TIME);
     }
 
     public void changeModule(View view) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setTitle("切换模式");
+
         if (Constants.isInsign) {
-            Constants.isInsign = false;
+            dialogBuilder.setMessage("切换到模板模式吗?");
         } else {
-            Constants.isInsign = true;
+            dialogBuilder.setMessage("切换到全量模式吗?");
         }
-        toastInsign();
+
+        dialogBuilder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (Constants.isInsign) {
+                    Constants.isInsign = false;
+                } else {
+                    Constants.isInsign = true;
+                }
+                toastInsign();
+            }
+        });
+        dialogBuilder.setNegativeButton("取消", null);
+        AlertDialog dialog = dialogBuilder.create();
+        dialog.show();
+
+
     }
 
     private void initInsign() {
@@ -150,16 +200,25 @@ public class MainActivity extends BaseActivity {
         } else {
             Constants.isInsign = false;
         }
+
+
         toastInsign();
     }
 
+
     private void toastInsign() {
         if (Constants.isInsign) {
-            ViewUtil.showSingleToast(this, "当前位置为全量,下载将会下载3000张原图");
+            ViewUtil.showSingleToast(this, "当前模式为全量");
         } else {
-            ViewUtil.showSingleToast(this, "当前位置为模板部分,下载将会下载7张模板图片");
+            ViewUtil.showSingleToast(this, "当前模式为模板部分");
+        }
+        if (Constants.isInsign) {
+            changeModuleTV.setText("全量模式-[点击切换]");
+        } else {
+            changeModuleTV.setText("模板模式-[点击切换]");
         }
     }
+
 
     private void restoreData() {
         String num = ShareUitl.getString(Constants.SHARE_PREF, "num", this);
@@ -490,19 +549,23 @@ public class MainActivity extends BaseActivity {
 
     public void toShow(View view) {
 
+
         DownLoadUtil checkUtil = new DownLoadUtil();
         checkUtil.setOnDataGet(new DownLoadUtil.OnDataGet() {
             @Override
             public void onUrlsGet(String json) {
-                ImagesUrl imagesUrl = Translate.translateTemplateUrl(json);
+                ImagesUrl imagesUrl = Translate.translateUrl(json);
                 int hasDownload = StorageUtil.hasDownload();
-                int targetUrlSize = imagesUrl.getUrl().size();
+                List<String> url = imagesUrl.getUrl();
+                int targetUrlSize = filterUrl(url);
+
                 if (targetUrlSize > hasDownload) {
                     Constants.shouldStopNow = true;
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setMessage("图片下载数量不够，请再次点击下载");
+                    builder.setMessage("图片下载数量不够，请再次点击下载" + "目标数:" + targetUrlSize + " 当前数:" + hasDownload);
                     builder.create().show();
                 } else {
+                    ViewUtil.showSingleToast(MainActivity.this, "校验成功!");
                     Constants.shouldStopNow = false;
                     Intent intent = new Intent(MainActivity.this, PrepareActivity.class);
                     startActivity(intent);
@@ -530,13 +593,16 @@ public class MainActivity extends BaseActivity {
             public void onTemplateGet(String json) {
                 ImagesUrl imagesUrl = Translate.translateTemplateUrl(json);
                 int hasDownload = StorageUtil.hasDownload();
-                int targetUrlSize = imagesUrl.getUrl().size();
+//                int targetUrlSize = imagesUrl.getUrl().size();
+                List<String> url = imagesUrl.getUrl();
+                int targetUrlSize = filterUrl(url);
                 if (targetUrlSize > hasDownload) {
                     Constants.shouldStopNow = true;
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setMessage("图片下载数量不够，请再次点击下载");
+                    builder.setMessage("图片下载数量不够，请再次点击下载" + "目标数:" + targetUrlSize + " 当前数:" + hasDownload);
                     builder.create().show();
                 } else {
+                    ViewUtil.showSingleToast(MainActivity.this, "校验成功!");
                     Constants.shouldStopNow = false;
                     Intent intent = new Intent(MainActivity.this, PrepareActivity.class);
                     startActivity(intent);
@@ -550,6 +616,7 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        ViewUtil.showSingleToast(MainActivity.this, "校验中...");
         if (Insign.isInsign()) {
             checkUtil.getUrls();
         } else {
@@ -558,6 +625,12 @@ public class MainActivity extends BaseActivity {
         }
 
 
+    }
+
+    private int filterUrl(List<String> url) {
+        Set<String> set = new HashSet<>(url);
+        List<String> filterSet = new ArrayList<>(set);
+        return filterSet.size();
     }
 
 //    public void choose(View view) {
@@ -614,7 +687,9 @@ public class MainActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                hasDownloadTv.setText("已下载 " + hasDownload);
+                if (null != hasDownloadTv) {
+                    hasDownloadTv.setText("已下载 " + hasDownload);
+                }
             }
         });
 
@@ -671,4 +746,63 @@ public class MainActivity extends BaseActivity {
         startTimeStamp = null;
     }
 
+
+    static int versioncode = 0;
+
+    /**
+     * 返回当前程序版本名
+     */
+    public static String getAppVersionName(Context context) {
+        String versionName = "";
+
+        try {
+            // ---get the package info---
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            versionName = pi.versionName;
+            versioncode = pi.versionCode;
+            if (versionName == null || versionName.length() <= 0) {
+                return "";
+            }
+        } catch (Exception e) {
+            Log.e("VersionInfo", "Exception", e);
+        }
+        return versionName;
+    }
+
+
+    int clickCount = 1;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                clickCount++;
+                if (clickCount > 2) {
+
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                checkoutTime();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ViewUtil.showSingleToast(MainActivity.this, "矫正时间 ~ 偏差时间: " + Constants.UP_CUT_TIME + " 毫秒");
+                                        clickCount = 1;
+                                    }
+                                });
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                ViewUtil.showSingleToast(MainActivity.this, "网络异常,刷新时间失败");
+                            }
+                        }
+                    }.start();
+
+
+                }
+                break;
+        }
+        return super.onTouchEvent(event);
+    }
 }

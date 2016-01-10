@@ -78,7 +78,7 @@ public class DownLoadUtil {
             public void run() {
                 try {
                     log("开始获取默认图片");
-                    String json = HttpUtil.get(Constants.DEFAULT_PIC_URL);
+                    String json = HttpUtil.get(Constants.IMAGE_URL_HOST);
                     log("获取成功" + json);
                     mHandler.obtainMessage(3, json).sendToTarget();
                 } catch (IOException e) {

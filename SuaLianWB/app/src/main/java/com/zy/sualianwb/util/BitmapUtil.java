@@ -3,6 +3,7 @@ package com.zy.sualianwb.util;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -20,9 +21,12 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.content.Intent;
+
 
 import com.zy.sualianwb.BigImageView;
 import com.zy.sualianwb.Constants;
+import com.zy.sualianwb.activity.MainActivity;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -415,10 +419,18 @@ public class BitmapUtil {
     private Handler mUIHandler = new Handler() {
         public void handleMessage(Message msg) {
             if (msg.what == -200) {
+                StorageUtil.clearShowTimeCache();
                 String path = (String) msg.obj;
                 Log.w(TAG, "没有成功下载此图片" + path);
                 AlertDialog.Builder b = new AlertDialog.Builder(mContext);
-                b.setMessage("没有成功下载此图片" + path + " ,播放已被停止");
+                b.setMessage("没有成功下载此图片" + path + "");
+                b.setPositiveButton("停止", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent i = new Intent(mContext, MainActivity.class);
+                        mContext.startActivity(i);
+                    }
+                });
                 b.create().show();
                 return;
             }

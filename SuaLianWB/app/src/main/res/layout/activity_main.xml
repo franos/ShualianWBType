@@ -37,12 +37,12 @@
             android:visibility="gone" />
 
         <Button
-            android:visibility="gone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="changePos"
-            android:text="修改" />
+            android:text="修改"
+            android:visibility="gone" />
     </LinearLayout>
 
     <TextView
@@ -92,7 +92,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/main_change_module"
@@ -102,7 +103,16 @@
             android:clickable="true"
             android:onClick="changeModule"
             android:text="切换模式"
-            android:textSize="32dp" />
+            android:textSize="18sp" />
+
+
+        <TextView
+            android:id="@+id/main_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="版本"
+            android:textSize="18sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -140,7 +150,7 @@
         android:id="@+id/all_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="总时间" />
+        android:text="" />
 
     <TextView
         android:id="@+id/main_hasDownload"
@@ -179,7 +189,7 @@
             style="@style/TextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:onClick="clear"
             android:text="清除所有数据(包括图片)"
             android:textColor="#BF360C"
