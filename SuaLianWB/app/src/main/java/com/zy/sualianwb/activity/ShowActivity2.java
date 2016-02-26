@@ -1,5 +1,6 @@
 package com.zy.sualianwb.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,7 +9,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.WindowManager;
-import android.content.Intent;
 
 import com.zy.sualianwb.Constants;
 import com.zy.sualianwb.R;
@@ -35,6 +35,12 @@ public class ShowActivity2 extends BaseActivity {
     private boolean isRun = true;
     private String TAG = "ShowActivity2";
     private String currUrl;
+    private long currTimeMillis;
+//    private boolean canplay = false;
+
+
+    private ShowTime3 currShowTime;
+    private ShowTime3 targetShowTime;
 
 
     @Override
@@ -80,6 +86,7 @@ public class ShowActivity2 extends BaseActivity {
                         e.printStackTrace();
                     }
                     String targetUrl = null;
+                    ShowTime3 targetShowTime = null;
                     List<ShowTime3> playShowTimeList = Constants.playShowTimeList;
                     if (playShowTimeList != null) {
                         for (int i = 0; i < playShowTimeList.size(); i++) {
@@ -88,13 +95,28 @@ public class ShowActivity2 extends BaseActivity {
                             long diff = getDiff(targetStamp);
                             if (diff <= 0) {
 //                                targetUrl = showTime3.getSrc();
+                                //获得可以显示的图
                                 targetUrl = getSrc(showTime3);
+                                targetShowTime = showTime3;
+                                long targetStampMillis = targetStamp.getTime();
+
+
+//                                if (currTimeMillis >= targetStampMillis) {
+//                                    Log.w(TAG, "当前时间大于目标时间，不可以播放");
+//                                    canplay = false;
+//                                } else {
+//                                    Log.w(TAG, "当前时间小于目标时间，可以播放");
+//                                    canplay = true;
+//                                    currTimeMillis = targetStampMillis;
+//                                }
+
 
                             } else {
                                 break;
                             }
                         }
-                        sendToPlayUrl(targetUrl);
+//                        sendToPlayUrl(targetUrl);
+                        sendToPlayUrl(targetShowTime);
                     }
                 }
             }
@@ -122,9 +144,12 @@ public class ShowActivity2 extends BaseActivity {
         playHandler.obtainMessage(1, showTime3).sendToTarget();
     }
 
-    private void sendToPlayUrl(String url) {
+    private void sendToPlayUrl(ShowTime3 url) {
         playHandler.obtainMessage(3, url).sendToTarget();
     }
+//    private void sendToPlayUrl(String url) {
+//        playHandler.obtainMessage(3, url).sendToTarget();
+//    }
 
     private Handler playHandler = new Handler() {
         @Override
@@ -141,18 +166,54 @@ public class ShowActivity2 extends BaseActivity {
                 show(defaultUrl.getSrc());
             }
 
+//            if (msg.what == 3) {
+//                String targetUrl = (String) msg.obj;
+//                if (null == targetUrl) {
+//                    Log.w(TAG, "targetUrl is null");
+//                    return;
+//                }
+//                if (targetUrl.equals(currUrl)) {
+//                    Log.w(TAG, "currUrl 和 targetUrl相同，且不可以播放");
+//
+//
+//                    return;
+//                }
+////                if (targetUrl.equals(currUrl) && !canplay) {
+////                    Log.w(TAG, "currUrl 和 targetUrl相同，且不可以播放");
+////                    return;
+////                }
+//                Log.i(TAG, "show currUrl=" + currUrl);
+//
+//                currUrl = targetUrl;
+//                show(currUrl);
+//            }
+
             if (msg.what == 3) {
-                String targetUrl = (String) msg.obj;
+                ShowTime3 targetUrl = (ShowTime3) msg.obj;
                 if (null == targetUrl) {
                     Log.w(TAG, "targetUrl is null");
                     return;
                 }
-                if (targetUrl.equals(currUrl)) {
-                    Log.w(TAG, "currUrl 和 targetUrl相同");
+                String src = getSrc(targetUrl);
+                if (src.equals(currUrl)) {
+                    Log.w(TAG, "currUrl 和 targetUrl相同，且不可以播放");
+                    long time = targetUrl.targetStamp().getTime();
+
+                    if (time != currTimeMillis) {
+                        currTimeMillis = time;
+                        Log.i(TAG, "show currUrl=" + currUrl);
+                        currUrl = src;
+                        show(currUrl);
+                    }else
                     return;
                 }
+//                if (targetUrl.equals(currUrl) && !canplay) {
+//                    Log.w(TAG, "currUrl 和 targetUrl相同，且不可以播放");
+//                    return;
+//                }
                 Log.i(TAG, "show currUrl=" + currUrl);
-                currUrl = targetUrl;
+
+                currUrl = src;
                 show(currUrl);
             }
         }
@@ -251,7 +312,7 @@ public class ShowActivity2 extends BaseActivity {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 clickCount++;
-                if (clickCount > 3) {
+                if (clickCount > 6) {
                     Intent i = new Intent(ShowActivity2.this, MainActivity.class);
                     startActivity(i);
                     this.finish();

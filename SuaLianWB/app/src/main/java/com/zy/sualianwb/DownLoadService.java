@@ -85,6 +85,11 @@ public class DownLoadService extends Service {
                     L.i("onShowTimeGet", "showTime获取成功" + json);
                     List<ShowTime3> showTime = Translate.translateShowTime3(json);
 //                    L.i(TAG, "showTime转换完毕:" + showTime);
+                    if (showTime == null) {
+                        Log.w(TAG, "showTime from service is null");
+                        return;
+                    }
+
                     StorageUtil.saveShowTime3(DownLoadService.this, showTime);
                     Log.i(TAG, "矫正时间");
                     checkoutTime();
@@ -135,7 +140,15 @@ public class DownLoadService extends Service {
                         e.printStackTrace();
                     }
 
+                    long absDiff = Math.abs(Constants.UP_CUT_TIME - diff);
+                    if (absDiff > 1000) {
+                        Log.w(TAG, "the diff " + absDiff + "ms is wrong , ignore ");
+                        return;
+                    }
+
+
                     currCheckoutTime += diff;
+
 
                     Constants.UP_CUT_TIME = currCheckoutTime / timeDiffcheckoutCount;
 

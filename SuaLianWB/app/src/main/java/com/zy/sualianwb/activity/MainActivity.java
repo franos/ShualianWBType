@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.umeng.update.UmengUpdateAgent;
 import com.zy.sualianwb.Constants;
 import com.zy.sualianwb.R;
+import com.zy.sualianwb.WifiLinkService;
 import com.zy.sualianwb.base.BaseActivity;
 import com.zy.sualianwb.module.CrtTime;
 import com.zy.sualianwb.module.ImagesUrl;
@@ -86,6 +87,9 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         DeviceUtil.turnLight(this);
         restoreData();
+
+        checkOutWifi();
+
         oneTimeTV = (TextView) findViewById(R.id.one_time);
         allTimeTV = (TextView) findViewById(R.id.all_time);
         hang = (EditText) findViewById(R.id.main_change_num_y_edt);
@@ -141,6 +145,11 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    private void checkOutWifi() {
+        Toast.makeText(MainActivity.this, "检查wifi连接状况", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, WifiLinkService.class);
+        startService(intent);
+    }
 
 
     private void checkoutTime() throws IOException {
@@ -200,8 +209,6 @@ public class MainActivity extends BaseActivity {
         } else {
             Constants.isInsign = false;
         }
-
-
         toastInsign();
     }
 
@@ -554,10 +561,21 @@ public class MainActivity extends BaseActivity {
         checkUtil.setOnDataGet(new DownLoadUtil.OnDataGet() {
             @Override
             public void onUrlsGet(String json) {
+                //服务器的图片
                 ImagesUrl imagesUrl = Translate.translateUrl(json);
+                //本地已下载图片数量
                 int hasDownload = StorageUtil.hasDownload();
+                //服务器图片集合
                 List<String> url = imagesUrl.getUrl();
+                //服务器图片过滤后的数量
                 int targetUrlSize = filterUrl(url);
+//                //服务器过滤后的图片
+//                List<String> serverFilterUrl = filterUrlWithResult(url);
+                //未过滤的服务器图片数量
+//                int serverSizeUnFilter = url.size();
+
+//                Log.w(TAG, "未过滤的服务器图片数量:" + serverSizeUnFilter + "  服务器图片过滤后的数量:" + targetUrlSize);
+
 
                 if (targetUrlSize > hasDownload) {
                     Constants.shouldStopNow = true;
@@ -632,6 +650,13 @@ public class MainActivity extends BaseActivity {
         List<String> filterSet = new ArrayList<>(set);
         return filterSet.size();
     }
+
+    private List<String> filterUrlWithResult(List<String> url) {
+        Set<String> set = new HashSet<>(url);
+        List<String> filterSet = new ArrayList<>(set);
+        return filterSet;
+    }
+
 
 //    public void choose(View view) {
 ////
@@ -744,6 +769,8 @@ public class MainActivity extends BaseActivity {
         }
         currSecond = 0;
         startTimeStamp = null;
+
+
     }
 
 
@@ -788,13 +815,26 @@ public class MainActivity extends BaseActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        ViewUtil.showSingleToast(MainActivity.this, "矫正时间 ~ 偏差时间: " + Constants.UP_CUT_TIME + " 毫秒");
+                                        try {
+                                            ViewUtil.showSingleToast(MainActivity.this, "矫正时间 ~ 偏差时间: " + Constants.UP_CUT_TIME + " 毫秒");
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                         clickCount = 1;
                                     }
                                 });
                             } catch (IOException e) {
                                 e.printStackTrace();
-                                ViewUtil.showSingleToast(MainActivity.this, "网络异常,刷新时间失败");
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            ViewUtil.showSingleToast(MainActivity.this, "网络异常,刷新时间失败");
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
                             }
                         }
                     }.start();
@@ -805,4 +845,6 @@ public class MainActivity extends BaseActivity {
         }
         return super.onTouchEvent(event);
     }
+
+
 }

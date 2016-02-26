@@ -68,10 +68,19 @@ public class Translate {
 
 
     public static List<ShowTime3> translateShowTime3(String json) {
-        List<GetShowTime> getShowTimes = new JsonUtil().parseJsonArray(json, GetShowTime.class);
-        List<ShowTime3> showTime3s = getShowTime3(getShowTimes);
-        Log.i(TAG, "translate showtime result " + showTime3s);
-        return showTime3s;
+        try {
+            List<GetShowTime> getShowTimes = new JsonUtil().parseJsonArray(json, GetShowTime.class);
+            if (getShowTimes == null) {
+                Log.w(TAG, "showTimes get from service is null");
+                getShowTimes = new ArrayList<>(0);
+            }
+            List<ShowTime3> showTime3s = getShowTime3(getShowTimes);
+            Log.i(TAG, "translate showtime result " + showTime3s);
+            return showTime3s;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private static List<ShowTime3> getShowTime3(List<GetShowTime> getShowTimes) {
